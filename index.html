@@ -6,14 +6,14 @@
     <link rel="icon" href="https://files.catbox.moe/r31kfd.jpg" type="image/jpeg">
     <title>BubbleVerse · Personajes</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;800&display=swap');
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body, html {
             height: 100%;
             background-color: #000;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             color: white;
             overflow: hidden;
         }
@@ -61,34 +61,35 @@
             font-size: 12px; 
             letter-spacing: 10px; 
             text-transform: uppercase; 
-            font-weight: 200; 
+            font-weight: 300; 
             margin-bottom: 30px; 
             opacity: 0.6; 
+            font-family: 'Montserrat', sans-serif;
         }
 
-        /* BURBUJAS - estilo circular igual a las del ejemplo pero redondas */
+        /* BURBUJAS - estilo más pequeño */
         .bubbles-nav {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         .bubble-link {
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 20px;
-            transition: all 0.4s ease;
+            gap: 15px;
+            transition: all 0.3s ease;
             width: fit-content;
         }
 
-        /* círculo/burbuja */
+        /* círculo/burbuja más pequeño */
         .bubble-circle {
-            width: 70px;
-            height: 70px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -102,26 +103,28 @@
             object-fit: cover;
         }
 
-        /* texto estilo nav-link (igual al original) */
+        /* texto más pequeño y con tipografía Montserrat */
         .bubble-text {
-            font-size: 70px;
-            font-weight: 900;
-            line-height: 1;
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1.2;
             color: transparent;
-            -webkit-text-stroke: 1px rgba(255,255,255,0.2);
-            transition: all 0.4s ease;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.25);
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 1px;
         }
 
         .bubble-link:hover .bubble-circle {
-            border-color: rgba(255,255,255,0.6);
-            transform: scale(1.05);
+            border-color: rgba(255,255,255,0.7);
+            transform: scale(1.08);
             background: rgba(255, 255, 255, 0.15);
         }
 
         .bubble-link:hover .bubble-text {
             -webkit-text-stroke: 1px rgba(255,255,255,0);
             color: white;
-            transform: translateX(20px);
+            transform: translateX(12px);
         }
 
         .footer {
@@ -134,19 +137,21 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             opacity: 0.5;
+            font-family: 'Montserrat', sans-serif;
         }
 
-        .owner-tag { font-weight: 900; color: white; opacity: 1; }
+        .owner-tag { font-weight: 800; color: white; opacity: 1; }
 
         @media (max-width: 768px) {
-            .bubble-text { font-size: 45px; }
-            .bubble-circle { width: 50px; height: 50px; }
+            .bubble-text { font-size: 20px; }
+            .bubble-circle { width: 35px; height: 35px; }
+            .title { font-size: 9px; letter-spacing: 6px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- PERFIL (igual que el original) -->
+    <!-- PERFIL -->
     <div id="user-profile">
         <img class="user-avatar" src="https://files.catbox.moe/r31kfd.jpg" alt="profile">
     </div>
