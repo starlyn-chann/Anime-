@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://files.catbox.moe/r31kfd.jpg" type="image/jpeg">
+    <title>BubbleVerse · Personajes</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            height: 100%;
+            background-color: #000;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.8) 20%, transparent 100%), 
+                        url('https://files.catbox.moe/tut48g.jpeg');
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+        }
+
+        /* PERFIL SUPERIOR */
+        #user-profile {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 8px 18px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+
+        /* CONTENIDO PRINCIPAL */
+        .wrapper {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 8%;
+        }
+
+        .title { 
+            font-size: 12px; 
+            letter-spacing: 10px; 
+            text-transform: uppercase; 
+            font-weight: 200; 
+            margin-bottom: 30px; 
+            opacity: 0.6; 
+        }
+
+        /* BURBUJAS - estilo circular igual a las del ejemplo pero redondas */
+        .bubbles-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .bubble-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.4s ease;
+            width: fit-content;
+        }
+
+        /* círculo/burbuja */
+        .bubble-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .bubble-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* texto estilo nav-link (igual al original) */
+        .bubble-text {
+            font-size: 70px;
+            font-weight: 900;
+            line-height: 1;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.2);
+            transition: all 0.4s ease;
+        }
+
+        .bubble-link:hover .bubble-circle {
+            border-color: rgba(255,255,255,0.6);
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .bubble-link:hover .bubble-text {
+            -webkit-text-stroke: 1px rgba(255,255,255,0);
+            color: white;
+            transform: translateX(20px);
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 40px;
+            left: 8%;
+            display: flex;
+            gap: 50px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.5;
+        }
+
+        .owner-tag { font-weight: 900; color: white; opacity: 1; }
+
+        @media (max-width: 768px) {
+            .bubble-text { font-size: 45px; }
+            .bubble-circle { width: 50px; height: 50px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PERFIL (igual que el original) -->
+    <div id="user-profile">
+        <img class="user-avatar" src="https://files.catbox.moe/r31kfd.jpg" alt="profile">
+    </div>
+
+    <div class="background-overlay"></div>
+
+    <div class="wrapper" id="main-content">
+        <div class="title">✦ PERSONAJES ✦</div>
+        <div class="bubbles-nav">
+            <!-- Billie Eilish - abre billie.html -->
+            <a href="billie.html" class="bubble-link">
+                <div class="bubble-circle">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Billie_Eilish_2024_%28cropped%29.jpg/440px-Billie_Eilish_2024_%28cropped%29.jpg" alt="Billie">
+                </div>
+                <span class="bubble-text">BILLIE EILISH</span>
+            </a>
+        </div>
+        <div class="footer">
+            <div class="owner-tag">𝓢𝓽𝓪𝓻𝓛𝔂𝓷</div>
+        </div>
+    </div>
+
+</body>
+</html>
