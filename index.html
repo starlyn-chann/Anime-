@@ -28,7 +28,7 @@
             z-index: 1;
         }
 
-        /* PERFIL SUPERIOR - ahora con más elementos */
+        /* PERFIL SUPERIOR */
         #user-profile {
             position: fixed;
             top: 25px;
@@ -46,7 +46,7 @@
 
         .user-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
 
-        /* burbujas de estado (batería y conexión) */
+        /* burbujas de estado */
         .status-bubble {
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(8px);
@@ -128,7 +128,6 @@
             width: fit-content;
         }
 
-        /* círculo/burbuja */
         .bubble-circle {
             width: 45px;
             height: 45px;
@@ -148,7 +147,6 @@
             object-fit: cover;
         }
 
-        /* texto */
         .bubble-text {
             font-size: 28px;
             font-weight: 800;
@@ -198,7 +196,7 @@
 </head>
 <body>
 
-    <!-- PERFIL + BURBUJAS DE ESTADO -->
+    <!-- PERFIL + BURBUJAS -->
     <div id="user-profile">
         <img class="user-avatar" src="https://files.catbox.moe/4m8x7l.jpeg" alt="profile">
         
@@ -210,10 +208,10 @@
             <span id="batteryPercent">--%</span>
         </div>
         
-        <!-- Burbuja de conexión -->
-        <div class="status-bubble" id="connectionBubble">
+        <!-- Burbuja de hora (México, formato 12h) -->
+        <div class="status-bubble" id="timeBubble">
             <span></span>
-            <span id="connectionType">...</span>
+            <span id="timeDisplay">--:-- --</span>
         </div>
     </div>
 
@@ -222,7 +220,6 @@
     <div class="wrapper" id="main-content">
         <div class="title">✦ PERSONAJES ✦</div>
         <div class="bubbles-nav">
-            <!-- Billie Eilish - abre billie.html -->
             <a href="billie.html" class="bubble-link">
                 <div class="bubble-circle">
                     <img src="https://files.catbox.moe/inev48.jpeg" alt="Billie">
@@ -238,22 +235,18 @@
     <script>
         // ========== BATERÍA ==========
         async function getBatteryInfo() {
-            // Verificar si la API de batería está disponible
             if ('getBattery' in navigator) {
                 try {
                     const battery = await navigator.getBattery();
                     updateBatteryUI(battery);
                     
-                    // Escuchar cambios
                     battery.addEventListener('levelchange', () => updateBatteryUI(battery));
                     battery.addEventListener('chargingchange', () => updateBatteryUI(battery));
                 } catch (err) {
                     document.getElementById('batteryPercent').textContent = '?%';
                     document.getElementById('batteryLevelFill').style.width = '50%';
-                    console.log('Error accediendo a batería:', err);
                 }
             } else {
-                // API no soportada
                 document.getElementById('batteryPercent').textContent = 'N/A';
                 document.getElementById('batteryLevelFill').style.width = '50%';
                 document.getElementById('batteryLevelFill').style.background = '#888';
@@ -265,19 +258,16 @@
             const percentElem = document.getElementById('batteryPercent');
             const fillElem = document.getElementById('batteryLevelFill');
             
-            percentElem.textContent = `${level}%`;
             fillElem.style.width = `${level}%`;
             
-            // Cambiar color según nivel
             if (level <= 15) {
-                fillElem.style.background = '#ef4444'; // rojo
+                fillElem.style.background = '#ef4444';
             } else if (level <= 30) {
-                fillElem.style.background = '#f59e0b'; // naranja
+                fillElem.style.background = '#f59e0b';
             } else {
-                fillElem.style.background = '#4ade80'; // verde
+                fillElem.style.background = '#4ade80';
             }
             
-            // Si está cargando, mostrar ícono de rayo
             if (battery.charging) {
                 percentElem.innerHTML = `${level}%`;
             } else {
@@ -285,65 +275,40 @@
             }
         }
         
-        // ========== CONEXIÓN (4G, 3G, 2G, H+, WiFi, etc.) ==========
-        function getConnectionType() {
-            const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        // ========== HORA LOCAL DE MÉXICO (formato 12h) ==========
+        function updateMexicoTime() {
+            // México tiene múltiples husos horarios, usamos el horario de Ciudad de México (Centro)
+            // Opciones para hora en formato 12 horas con AM/PM
+            const options = {
+                timeZone: 'America/Mexico_City',
+                hour12: true,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
             
-            if (!conn) {
-                document.getElementById('connectionType').textContent = '?';
-                return;
-            }
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-MX', options);
             
-            let type = conn.effectiveType; // '4g', '3g', '2g', 'slow-2g'
-            let displayType = '';
+            // toLocaleTimeString devuelve algo como "02:35:42 p. m." o "02:35:42 PM"
+            // Lo formateamos para que se vea limpio
+            let formatted = timeString;
+            // Reemplazar "p. m." por "PM" y "a. m." por "AM" para mayor claridad
+            formatted = formatted.replace('p. m.', 'PM').replace('a. m.', 'AM');
             
-            switch(type) {
-                case '4g':
-                    displayType = '4G';
-                    break;
-                case '3g':
-                    displayType = '3G';
-                    break;
-                case '2g':
-                    displayType = '2G';
-                    break;
-                case 'slow-2g':
-                    displayType = '2G';
-                    break;
-                default:
-                    displayType = type ? type.toUpperCase() : '?';
-            }
-            
-            // Si es WiFi (no siempre detectable, pero algunos navegadores lo dan)
-            if (conn.type === 'wifi' || conn.type === 'ethernet') {
-                displayType = 'WiFi';
-            }
-            
-            document.getElementById('connectionType').textContent = displayType;
-            
-            // Escuchar cambios de conexión
-            conn.addEventListener('change', () => {
-                let newType = conn.effectiveType;
-                let newDisplay = '';
-                switch(newType) {
-                    case '4g': newDisplay = '4G'; break;
-                    case '3g': newDisplay = '3G'; break;
-                    case '2g': newDisplay = '2G'; break;
-                    case 'slow-2g': newDisplay = '2G'; break;
-                    default: newDisplay = newType ? newType.toUpperCase() : '?';
-                }
-                if (conn.type === 'wifi') newDisplay = 'WiFi';
-                document.getElementById('connectionType').textContent = newDisplay;
-            });
+            document.getElementById('timeDisplay').textContent = formatted;
         }
         
-        // Inicializar todo cuando la página cargue
+        // Actualizar hora cada segundo
+        setInterval(updateMexicoTime, 1000);
+        
+        // Inicializar todo
         window.addEventListener('load', () => {
             getBatteryInfo();
-            getConnectionType();
+            updateMexicoTime();
         });
         
-        // Actualizar batería cada 30 segundos por si acaso (algunos navegadores no emiten eventos)
+        // Actualizar batería cada 30 segundos
         setInterval(() => {
             if ('getBattery' in navigator) {
                 navigator.getBattery().then(battery => updateBatteryUI(battery)).catch(() => {});
