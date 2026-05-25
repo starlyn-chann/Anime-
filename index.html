@@ -28,7 +28,7 @@
             z-index: 1;
         }
 
-        /* PERFIL SUPERIOR */
+        /* PERFIL SUPERIOR - ahora con más elementos */
         #user-profile {
             position: fixed;
             top: 25px;
@@ -36,7 +36,7 @@
             z-index: 100;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             padding: 8px 18px;
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(10px);
@@ -45,6 +45,51 @@
         }
 
         .user-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+
+        /* burbujas de estado (batería y conexión) */
+        .status-bubble {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 40px;
+            padding: 5px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .status-bubble span {
+            font-size: 12px;
+        }
+
+        .battery-icon {
+            width: 18px;
+            height: 10px;
+            border: 1px solid rgba(255,255,255,0.7);
+            border-radius: 3px;
+            position: relative;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .battery-icon::after {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: 2px;
+            width: 3px;
+            height: 4px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 1px;
+        }
+
+        .battery-level {
+            height: 100%;
+            border-radius: 2px;
+            background: #4ade80;
+        }
 
         /* CONTENIDO PRINCIPAL */
         .wrapper {
@@ -146,14 +191,30 @@
             .bubble-text { font-size: 20px; }
             .bubble-circle { width: 35px; height: 35px; }
             .title { font-size: 9px; letter-spacing: 6px; }
+            .status-bubble { padding: 3px 8px; font-size: 9px; }
+            .status-bubble span { font-size: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- PERFIL -->
+    <!-- PERFIL + BURBUJAS DE ESTADO -->
     <div id="user-profile">
         <img class="user-avatar" src="https://files.catbox.moe/4m8x7l.jpeg" alt="profile">
+        
+        <!-- Burbuja de batería -->
+        <div class="status-bubble" id="batteryBubble">
+            <div class="battery-icon">
+                <div class="battery-level" id="batteryLevelFill" style="width: 0%;"></div>
+            </div>
+            <span id="batteryPercent">--%</span>
+        </div>
+        
+        <!-- Burbuja de conexión -->
+        <div class="status-bubble" id="connectionBubble">
+            <span></span>
+            <span id="connectionType">...</span>
+        </div>
     </div>
 
     <div class="background-overlay"></div>
@@ -161,7 +222,7 @@
     <div class="wrapper" id="main-content">
         <div class="title">✦ PERSONAJES ✦</div>
         <div class="bubbles-nav">
-            <!-- Billie Eilish - abre billie.html con la nueva imagen -->
+            <!-- Billie Eilish - abre billie.html -->
             <a href="billie.html" class="bubble-link">
                 <div class="bubble-circle">
                     <img src="https://files.catbox.moe/inev48.jpeg" alt="Billie">
@@ -174,5 +235,120 @@
         </div>
     </div>
 
+    <script>
+        // ========== BATERÍA ==========
+        async function getBatteryInfo() {
+            // Verificar si la API de batería está disponible
+            if ('getBattery' in navigator) {
+                try {
+                    const battery = await navigator.getBattery();
+                    updateBatteryUI(battery);
+                    
+                    // Escuchar cambios
+                    battery.addEventListener('levelchange', () => updateBatteryUI(battery));
+                    battery.addEventListener('chargingchange', () => updateBatteryUI(battery));
+                } catch (err) {
+                    document.getElementById('batteryPercent').textContent = '?%';
+                    document.getElementById('batteryLevelFill').style.width = '50%';
+                    console.log('Error accediendo a batería:', err);
+                }
+            } else {
+                // API no soportada
+                document.getElementById('batteryPercent').textContent = 'N/A';
+                document.getElementById('batteryLevelFill').style.width = '50%';
+                document.getElementById('batteryLevelFill').style.background = '#888';
+            }
+        }
+        
+        function updateBatteryUI(battery) {
+            const level = Math.round(battery.level * 100);
+            const percentElem = document.getElementById('batteryPercent');
+            const fillElem = document.getElementById('batteryLevelFill');
+            
+            percentElem.textContent = `${level}%`;
+            fillElem.style.width = `${level}%`;
+            
+            // Cambiar color según nivel
+            if (level <= 15) {
+                fillElem.style.background = '#ef4444'; // rojo
+            } else if (level <= 30) {
+                fillElem.style.background = '#f59e0b'; // naranja
+            } else {
+                fillElem.style.background = '#4ade80'; // verde
+            }
+            
+            // Si está cargando, mostrar ícono de rayo
+            if (battery.charging) {
+                percentElem.innerHTML = `${level}%`;
+            } else {
+                percentElem.innerHTML = `${level}%`;
+            }
+        }
+        
+        // ========== CONEXIÓN (4G, 3G, 2G, H+, WiFi, etc.) ==========
+        function getConnectionType() {
+            const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            
+            if (!conn) {
+                document.getElementById('connectionType').textContent = '?';
+                return;
+            }
+            
+            let type = conn.effectiveType; // '4g', '3g', '2g', 'slow-2g'
+            let displayType = '';
+            
+            switch(type) {
+                case '4g':
+                    displayType = '4G';
+                    break;
+                case '3g':
+                    displayType = '3G';
+                    break;
+                case '2g':
+                    displayType = '2G';
+                    break;
+                case 'slow-2g':
+                    displayType = '2G';
+                    break;
+                default:
+                    displayType = type ? type.toUpperCase() : '?';
+            }
+            
+            // Si es WiFi (no siempre detectable, pero algunos navegadores lo dan)
+            if (conn.type === 'wifi' || conn.type === 'ethernet') {
+                displayType = 'WiFi';
+            }
+            
+            document.getElementById('connectionType').textContent = displayType;
+            
+            // Escuchar cambios de conexión
+            conn.addEventListener('change', () => {
+                let newType = conn.effectiveType;
+                let newDisplay = '';
+                switch(newType) {
+                    case '4g': newDisplay = '4G'; break;
+                    case '3g': newDisplay = '3G'; break;
+                    case '2g': newDisplay = '2G'; break;
+                    case 'slow-2g': newDisplay = '2G'; break;
+                    default: newDisplay = newType ? newType.toUpperCase() : '?';
+                }
+                if (conn.type === 'wifi') newDisplay = 'WiFi';
+                document.getElementById('connectionType').textContent = newDisplay;
+            });
+        }
+        
+        // Inicializar todo cuando la página cargue
+        window.addEventListener('load', () => {
+            getBatteryInfo();
+            getConnectionType();
+        });
+        
+        // Actualizar batería cada 30 segundos por si acaso (algunos navegadores no emiten eventos)
+        setInterval(() => {
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(battery => updateBatteryUI(battery)).catch(() => {});
+            }
+        }, 30000);
+    </script>
 </body>
 </html>
