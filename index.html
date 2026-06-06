@@ -196,11 +196,9 @@
 </head>
 <body>
 
-    <!-- PERFIL + BURBUJAS -->
     <div id="user-profile">
         <img class="user-avatar" src="https://files.catbox.moe/4m8x7l.jpeg" alt="profile">
         
-        <!-- Burbuja de batería -->
         <div class="status-bubble" id="batteryBubble">
             <div class="battery-icon">
                 <div class="battery-level" id="batteryLevelFill" style="width: 0%;"></div>
@@ -208,7 +206,6 @@
             <span id="batteryPercent">--%</span>
         </div>
         
-        <!-- Burbuja de hora (México, formato 12h) -->
         <div class="status-bubble" id="timeBubble">
             <span></span>
             <span id="timeDisplay">--:-- --</span>
@@ -226,7 +223,15 @@
                 </div>
                 <span class="bubble-text">BILLIE EILISH</span>
             </a>
+
+            <a href="isaac.html" class="bubble-link">
+                <div class="bubble-circle">
+                    <img src="https://files.catbox.moe/r31kfd.jpg" alt="Isaac">
+                </div>
+                <span class="bubble-text">ISAAC ORDOÑEZ</span>
+            </a>
         </div>
+        
         <div class="footer">
             <div class="owner-tag">𝓢𝓽𝓪𝓻𝓛𝔂𝓷</div>
         </div>
@@ -277,8 +282,6 @@
         
         // ========== HORA LOCAL DE MÉXICO (formato 12h) ==========
         function updateMexicoTime() {
-            // México tiene múltiples husos horarios, usamos el horario de Ciudad de México (Centro)
-            // Opciones para hora en formato 12 horas con AM/PM
             const options = {
                 timeZone: 'America/Mexico_City',
                 hour12: true,
@@ -290,25 +293,19 @@
             const now = new Date();
             const timeString = now.toLocaleTimeString('es-MX', options);
             
-            // toLocaleTimeString devuelve algo como "02:35:42 p. m." o "02:35:42 PM"
-            // Lo formateamos para que se vea limpio
             let formatted = timeString;
-            // Reemplazar "p. m." por "PM" y "a. m." por "AM" para mayor claridad
             formatted = formatted.replace('p. m.', 'PM').replace('a. m.', 'AM');
             
             document.getElementById('timeDisplay').textContent = formatted;
         }
         
-        // Actualizar hora cada segundo
         setInterval(updateMexicoTime, 1000);
         
-        // Inicializar todo
         window.addEventListener('load', () => {
             getBatteryInfo();
             updateMexicoTime();
         });
         
-        // Actualizar batería cada 30 segundos
         setInterval(() => {
             if ('getBattery' in navigator) {
                 navigator.getBattery().then(battery => updateBatteryUI(battery)).catch(() => {});
