@@ -123,6 +123,7 @@
 </div>
 
 <script>
+    // 1. Array con tus enlaces fijos de Catbox
     const images = [
         "https://files.catbox.moe/zo3xe6.jpeg",
         "https://files.catbox.moe/9hhhk3.jpeg",
@@ -145,6 +146,16 @@
         "https://files.catbox.moe/60o9c3.jpeg"
     ];
 
+    // 2. Configuración para tus imágenes locales secuenciales
+    // Cambia el 50 por un número mayor si llegas a meter más fotos en tu carpeta
+    const limiteImagenes = 50; 
+
+    for (let i = 1; i <= limiteImagenes; i++) {
+        // Añade la versión .jpg y .jpeg de cada número al pool de opciones
+        images.push(`./billie/image${i}.jpg`);
+        images.push(`./billie/image${i}.jpeg`);
+    }
+
     const randomImage = document.getElementById('randomImage');
     const refreshBtn = document.getElementById('refreshBtn');
 
@@ -157,7 +168,15 @@
         randomImage.src = getRandomImage();
     }
 
+    // 🌟 TRUCO CLAVE: Si una ruta local falla (porque la imagen no existe), 
+    // vuelve a disparar la función automáticamente para buscar una válida al instante.
+    randomImage.onerror = function() {
+        updateImage();
+    };
+
     refreshBtn.addEventListener('click', updateImage);
+    
+    // Ejecutar al cargar la página por primera vez
     updateImage();
 </script>
 
