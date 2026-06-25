@@ -118,12 +118,11 @@
 
     <div class="buttons">
         <a href="index.html" class="btn btn-primary">← VOLVER</a>
-        <button id="refreshBtn" class="btn btn-secondary">CAMBIAR</button>
+        <button id="refreshBtn" class="btn btn-secondary">CAMBIAR FOTO</button>
     </div>
 </div>
 
 <script>
-    // 1. Array con tus enlaces fijos de Catbox
     const images = [
         "https://files.catbox.moe/zo3xe6.jpeg",
         "https://files.catbox.moe/9hhhk3.jpeg",
@@ -146,12 +145,9 @@
         "https://files.catbox.moe/60o9c3.jpeg"
     ];
 
-    // 2. Configuración para tus imágenes locales secuenciales
-    // Cambia el 50 por un número mayor si llegas a meter más fotos en tu carpeta
     const limiteImagenes = 50; 
 
     for (let i = 1; i <= limiteImagenes; i++) {
-        // Añade la versión .jpg y .jpeg de cada número al pool de opciones
         images.push(`./billie/image${i}.jpg`);
         images.push(`./billie/image${i}.jpeg`);
     }
@@ -164,20 +160,50 @@
         return images[randomIndex];
     }
 
-    function updateImage() {
-        randomImage.src = getRandomImage();
+    // Función para forzar el cuadro de descarga del navegador
+    async function triggerDownload(url) {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            
+            const extension = url.split('.').pop().split('?')[0] || 'jpg';
+            link.download = `billie-eilish-${Date.now()}.${extension}`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            console.log("Descarga automática bloqueada o requiere interacción directa.");
+        }
     }
 
-    // 🌟 TRUCO CLAVE: Si una ruta local falla (porque la imagen no existe), 
-    // vuelve a disparar la función automáticamente para buscar una válida al instante.
+    function updateImage(shouldDownload = false) {
+        const selectedUrl = getRandomImage();
+        randomImage.src = selectedUrl;
+        
+        // Si se pide descargar, se ejecuta la función del sistema
+        if (shouldDownload) {
+            triggerDownload(selectedUrl);
+        }
+    }
+
+    // Si una ruta local falla, busca otra imagen
     randomImage.onerror = function() {
-        updateImage();
+        updateImage(false); 
     };
 
-    refreshBtn.addEventListener('click', updateImage);
-    
-    // Ejecutar al cargar la página por primera vez
-    updateImage();
+    // Al hacer clic en "Cambiar", cambia la foto y también pregunta para descargar la nueva
+    refreshBtn.addEventListener('click', () => updateImage(true));
+
+    // Al ENTRAR por primera vez a la página: carga la imagen e inicia la descarga
+    window.addEventListener('DOMContentLoaded', () => {
+        updateImage(true);
+    });
 </script>
 
 </body>
